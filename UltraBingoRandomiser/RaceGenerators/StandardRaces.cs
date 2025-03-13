@@ -1,24 +1,7 @@
 ﻿using UltrakillRaceGenerator.ExtensionClasses;
+using System.Linq;
 
 namespace UltrakillRaceGenerator.RaceGenerators;
-
-[Flags]
-internal enum CategoryDefaults
-{
-    None = 0,
-    Any = 1,
-    P = 2,
-    Nomo = 4,
-    Nomow = 8,
-    InboundsAny = 16,
-    InboundsP = 32,
-    InboundsNomo = 64,
-    Inbounds = InboundsAny | InboundsP,
-    Weaponless = 128,
-    Check = 256,
-    Special = 512,
-    All = Any | P | Nomo | Nomow | InboundsAny | InboundsP | InboundsNomo | Weaponless | Check | Special
-}
 
 // TODO: clean this up, make it read from a json file and add it as a menu option
 internal static class StandardRaces
@@ -85,8 +68,8 @@ internal static class StandardRaces
     internal static Random random = new();
     internal static string GetRandomLevel()
     {
-        // Selects a random layer, and then a random level, so each layer has an equal chance of being selected
-        // However, not every level has an equal chance of being selected as a result
+        // Selects a random layer, and then a random multiLevel, so each layer has an equal chance of being selected
+        // However, not every multiLevel has an equal chance of being selected as a result
         string[] choices = [.. baseLevels.Values.Select(layer => random.Choice(layer))];
         return random.Choice(choices);
     }
@@ -94,14 +77,19 @@ internal static class StandardRaces
     internal static string[] GetRandomMultilevelRace(int count, CategoryDefaults categories)
     {
         IEnumerable<Category[]> selectedCategories = Categories.Where(pair => categories.HasFlag(pair.Key)).Select(pair => pair.Value);
-        IEnumerable<string> selectedRaceList = selectedCategories.Select(catGroup => random.Choice(baseList) + random.Choice(catGroup));
+        IEnumerable<string> selectedRaceList2 = selectedCategories.Select(catGroup => random.Choice(baseList) + " " + random.Choice(catGroup));
+        
+        IEnumerable<string> selectedRaceList = from catGroup in selectedCategories
+                                               from category in catGroup
+                                               from multiLevel in baseList
+                                               select multiLevel + " " + category;
 
         if (categories.HasFlag(CategoryDefaults.Special))
         {
-            selectedRaceList = selectedRaceList.Append(random.Choice(specialsList));
+            selectedRaceList2 = selectedRaceList2.Append(random.Choice(specialsList));
         }
 
-        string[] Races1 = random.GetItems(selectedRaceList.ToArray(), count);
+        string[] Races1 = random.GetUniqueItems(selectedRaceList2.ToArray(), count).ToArray();
         return Races1;
     }
     internal static string[] GetRandomILRaces(int count, CategoryDefaults categories)
@@ -113,7 +101,7 @@ internal static class StandardRaces
             .Select(catGroup => GetRandomLevel() + " " + random.Choice(catGroup))
             .Concat(categories.HasFlag(CategoryDefaults.Special) ? [random.Choice(specialLevels)] : []);
 
-        string[] Races2 = random.GetItems(selectedRaceList.ToArray(), count);
+        string[] Races2 = random.GetUniqueItems(selectedRaceList.ToArray(), count).ToArray();
         return Races2;
     }
 

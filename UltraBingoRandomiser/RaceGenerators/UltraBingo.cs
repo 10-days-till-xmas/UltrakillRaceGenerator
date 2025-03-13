@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-
+using UltrakillRaceGenerator.ExtensionClasses;
 namespace UltrakillRaceGenerator.RaceGenerators;
 
 internal class UltraBingo
@@ -26,9 +26,9 @@ internal class UltraBingo
 
     internal static string GenerateBingoBoard(string[] easy, string[] medium, string[] hard)
     {
-        var Easy = new Queue<string>(Random.Shared.GetItems(easy, 12));
-        var Medium = new Queue<string>(Random.Shared.GetItems(medium, 12));
-        var Hard = new Queue<string>(Random.Shared.GetItems(hard, 1));
+        var Easy = new Queue<string>(Random.Shared.GetUniqueItems(easy, 12));
+        var Medium = new Queue<string>(Random.Shared.GetUniqueItems(medium, 12));
+        var Hard = new Queue<string>(Random.Shared.GetUniqueItems(hard, 1));
 
         string[] Layout = [
             "E","E","M","E","E",
