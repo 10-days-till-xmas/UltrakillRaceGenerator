@@ -24,7 +24,7 @@ internal class UltraBingo
         }
     }
 
-    internal static string GenerateBingoBoard(string[] easy, string[] medium, string[] hard)
+    private static BingoTile[] GenerateBingoBoard(string[] easy, string[] medium, string[] hard)
     {
         var Easy = new Queue<string>(Random.Shared.GetUniqueItems(easy, 12));
         var Medium = new Queue<string>(Random.Shared.GetUniqueItems(medium, 12));
@@ -45,8 +45,22 @@ internal class UltraBingo
             _ => throw new Exception($"{difficulty} is not a valid difficulty")
         }).ToArray();
 
-        string json = JsonSerializer.Serialize(Board, jsonSerializerOptions);
+        return Board;
+    }
 
-        return json;
+    internal static string GenerateBingoBoardAsJsonString()
+    {
+        string[] easy;
+        string[] medium;
+        string[] hard;
+        (easy, medium, hard) = GetBingoBoardOptions();
+        BingoTile[] bingo = GenerateBingoBoard(easy, medium, hard);
+        string bingoJson = ConvertBingoBoardToJson(bingo);
+        return bingoJson;
+    }
+
+    private static string ConvertBingoBoardToJson(BingoTile[] board)
+    {
+        return JsonSerializer.Serialize(board, jsonSerializerOptions);
     }
 }
