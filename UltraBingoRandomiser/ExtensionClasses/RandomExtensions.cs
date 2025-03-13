@@ -1,4 +1,6 @@
-﻿namespace UltrakillRaceGenerator.ExtensionClasses;
+﻿using System.Runtime.CompilerServices;
+
+namespace UltrakillRaceGenerator.ExtensionClasses;
 public static class RandomExtensions
 {
     public static T Choice<T>(this Random random, IEnumerable<T> choices)
@@ -29,20 +31,17 @@ public static class RandomExtensions
             return choices;
         }
 
-        if (true || count < length / 2)
-        {
-            int[] indexRange = Enumerable.Range(0, length).ToArray();
-            random.Shuffle(indexRange);
+        int[] indexRange = Enumerable.Range(0, length).ToArray();
+        random.Shuffle(indexRange);
+        var selectedIndices = indexRange[0..count];
+        return choices.GetItemsWithIndices(selectedIndices);
 
-            return indexRange.Select(i => choices[i]);
-        }
-        else
+    }
+    private static IEnumerable<T> GetItemsWithIndices<T>(this T[] array, IEnumerable<int> indices)
+    {
+        foreach (var index in indices)
         {
-            int[] indexRange = Enumerable.Range(0, count).ToArray();
-            random.Shuffle(indexRange);
-            
-            return indexRange.Select(i => choices[i]);
+            yield return array[index];
         }
-        
     }
 }
