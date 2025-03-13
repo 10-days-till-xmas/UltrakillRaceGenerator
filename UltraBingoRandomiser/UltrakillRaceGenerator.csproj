@@ -10,10 +10,14 @@
 
   <ItemGroup>
     <None Remove="Data\BingoBoardOptions.json" />
+    <None Remove="Data\StandardRaceOptions.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Data\BingoBoardOptions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\StandardRaceOptions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

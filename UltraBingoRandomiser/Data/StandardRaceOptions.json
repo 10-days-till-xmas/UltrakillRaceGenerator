@@ -1,0 +1,53 @@
+{
+  "Base Multilevel": [
+    "Fullgame",
+    "Act1",
+    "Act2"
+  ],
+  "Special Multilevel": [
+    "Fullgame All Bosses",
+    "Fullgame All levels",
+    "Newgame Prelude",
+    "All Encores"
+  ],
+  "Base Levels": {
+    "Prelude": [ "0-1", "0-2", "0-3", "0-4", "0-5" ],
+    "Limbo": [ "1-1", "1-2", "1-3", "1-4" ],
+    "Lust": [ "2-1", "2-2", "2-3", "2-4" ],
+    "Gluttony": [ "3-1", "3-2" ],
+    "Greed": [ "4-1", "4-2", "4-3", "4-4" ],
+    "Wrath": [ "5-1", "5-2", "5-3", "5-4" ],
+    "Heresy": [ "6-1", "6-2" ],
+    "Violence": [ "7-1", "7-2", "7-3", "7-4" ],
+    "Sanctum": [ "P-1", "P-2" ],
+    "Encore": [ "0-E", "1-E" ]
+  },
+  "Special Levels": [
+    "0-S",
+    "1-S",
+    "2-S",
+    "4-S",
+    "5-S",
+    "0-2 Secret Exit",
+    "1-1 Secret Exit",
+    "2-3 Secret Exit",
+    "3-1 Secret Exit",
+    "4-2 Secret Exit",
+    "5-1 Secret Exit",
+    "6-2 Secret Exit",
+    "1-2 Rodent%",
+    "0-2 Secret Encounter",
+    "1-3 Agony and Tundra",
+    "1-4 Hank%",
+    "1-4 All Skulls",
+    "2-3 Break All power boxes",
+    "3-2 Drop Gaberiel in pit",
+    "4-2 Sandcastle%",
+    "4-3 Druid Knight",
+    "5-2 Sacrifice Florp",
+    "5-3 Make Hank Jr",
+    "5-4 No jumping",
+    "6-1 Angry and Rude",
+    "6-2 Drop Gabriel in the pit"
+  ]
+}

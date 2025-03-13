@@ -1,18 +1,18 @@
 ﻿using UltrakillRaceGenerator.ExtensionClasses;
-using System.Linq;
+using System.Text.Json;
+
 
 namespace UltrakillRaceGenerator.RaceGenerators;
 
-// TODO: clean this up, make it read from a json file and add it as a menu option
+// TODO: enable the ability to change the json file and read it again
 internal static class StandardRaces
 {
-    private static readonly string[] baseList = ["Fullgame", "Act1", "Act2"];
-    private static readonly string[] specialsList = [
-        "Fullgame All Bosses", 
-        "Fullgame All levels", 
-        "Newgame Prelude", 
-        "All Encores"
-        ];
+    private static string[] baseList = [];
+    private static string[] specialsList = [];
+    private static Dictionary<string, List<string>> baseLevels = [];
+    private static string[] specialLevels = [];
+
+    private static bool hasJsonBeenChecked = false;
 
     private static readonly Dictionary<CategoryDefaults, Category[]> Categories = new()
     {
@@ -24,58 +24,21 @@ internal static class StandardRaces
         { CategoryDefaults.Check, [Category.Check] }
     };
 
-    private static readonly Dictionary<string, string[]> baseLevels = new()
-    {
-        {"Prelude", ["0-1", "0-2", "0-3", "0-4", "0-5"]},
-        {"Limbo", ["1-1", "1-2", "1-3", "1-4"]},
-        {"Lust", ["2-1", "2-2", "2-3", "2-4"]},
-        {"Gluttony", ["3-1", "3-2"]},
-        {"Greed", ["4-1", "4-2", "4-3", "4-4"]},
-        {"Wrath", ["5-1", "5-2", "5-3", "5-4"]},
-        {"Heresy", ["6-1", "6-2"]},
-        {"Violence", ["7-1", "7-2", "7-3", "7-4"]},
-        {"Sanctum", ["P-1", "P-2"]},
-        {"Encore", ["0-E", "1-E"]}
-    };
-    private static readonly string[] specialLevels = [
-        "0-S",
-        "1-S",
-        "2-S",
-        "4-S",
-        "5-S",
-        "0-2 Secret Exit",
-        "1-1 Secret Exit",
-        "2-3 Secret Exit",
-        "3-1 Secret Exit",
-        "4-2 Secret Exit",
-        "5-1 Secret Exit",
-        "6-2 Secret Exit",
-        "1-2 Rodent%",
-        "0-2 Secret Encounter",
-        "1-3 Agony and Tundra",
-        "1-4 Hank%",
-        "1-4 All Skulls",
-        "2-3 Break All power boxes",
-        "3-2 Drop Gaberiel in pit",
-        "4-2 Sandcastle%",
-        "4-3 Druid Knight",
-        "5-2 Sacrifice Florp",
-        "5-3 Make Hank Jr",
-        "5-4 No jumping",
-        "6-1 Angry and Rude",
-        "6-2 Drop Gabriel in the pit"];
-
     internal static Random random = new();
     internal static string GetRandomLevel()
     {
+        CheckIfLevelListsAreInstantiated();
         // Selects a random layer, and then a random multiLevel, so each layer has an equal chance of being selected
         // However, not every multiLevel has an equal chance of being selected as a result
+
         string[] choices = [.. baseLevels.Values.Select(layer => random.Choice(layer))];
         return random.Choice(choices);
     }
 
     internal static string[] GetRandomMultilevelRace(int count, CategoryDefaults categories)
     {
+        CheckIfLevelListsAreInstantiated();
+
         IEnumerable<Category[]> selectedCategories = Categories.Where(pair => categories.HasFlag(pair.Key)).Select(pair => pair.Value);
         IEnumerable<string> selectedRaceList2 = selectedCategories.Select(catGroup => random.Choice(baseList) + " " + random.Choice(catGroup));
         
@@ -94,6 +57,8 @@ internal static class StandardRaces
     }
     internal static string[] GetRandomILRaces(int count, CategoryDefaults categories)
     {
+        CheckIfLevelListsAreInstantiated();
+
         IEnumerable<string> selectedRaceList =
             Categories
             .Where(pair => categories.HasFlag(pair.Key))
@@ -128,5 +93,35 @@ internal static class StandardRaces
             "-----",
             ..ILRaces
             ];
+    }
+
+    private static void CheckIfLevelListsAreInstantiated()
+    {
+        if (!hasJsonBeenChecked)
+        {
+            GetLevelListsFromJson();
+            hasJsonBeenChecked = true;
+        }
+    }
+
+    internal static bool GetLevelListsFromJson()
+    {
+        string filePath = Path.Combine(AppContext.BaseDirectory, "Data", "StandardRaceOptions.json");
+        try
+        {
+            string rawStandardRaceOptions = File.ReadAllText(filePath);
+            using JsonDocument doc = JsonDocument.Parse(rawStandardRaceOptions);
+            JsonElement root = doc.RootElement;
+            baseList = JsonSerializer.Deserialize<string[]>(root.GetProperty("Base Multilevel").GetRawText()) ?? [];
+            specialsList = JsonSerializer.Deserialize<string[]>(root.GetProperty("Special Multilevel").GetRawText()) ?? [];
+            baseLevels = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(root.GetProperty("Base Levels").GetRawText()) ?? [];
+            specialLevels = JsonSerializer.Deserialize<string[]>(root.GetProperty("Special Levels").GetRawText()) ?? [];
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read BingoBoardOptions.json: {ex.Message}");
+            return false;
+        }
     }
 }
