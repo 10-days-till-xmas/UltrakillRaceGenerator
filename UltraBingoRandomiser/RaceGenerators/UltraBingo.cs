@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using UltrakillRaceGenerator.ExtensionClasses;
 namespace UltrakillRaceGenerator.RaceGenerators;
 
 internal class UltraBingo
 {
-    private record BingoTile(string name);
+    internal record BingoTile([property: JsonPropertyName("name")] string Name);
 
     private static readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
 
@@ -23,7 +24,7 @@ internal class UltraBingo
             return ([], [], []);
         }
     }
-
+    private static BingoTile[] GenerateBingoBoard((string[] easy, string[] medium, string[] hard) options) => GenerateBingoBoard(options.easy, options.medium, options.hard);
     private static BingoTile[] GenerateBingoBoard(string[] easy, string[] medium, string[] hard)
     {
         var Easy = new Queue<string>(Random.Shared.GetUniqueItems(easy, 12));
@@ -50,13 +51,22 @@ internal class UltraBingo
 
     internal static string GenerateBingoBoardAsJsonString()
     {
-        string[] easy;
-        string[] medium;
-        string[] hard;
-        (easy, medium, hard) = GetBingoBoardOptions();
-        BingoTile[] bingo = GenerateBingoBoard(easy, medium, hard);
+        BingoTile[] bingo = GenerateBingoBoard(GetBingoBoardOptions());
         string bingoJson = ConvertBingoBoardToJson(bingo);
         return bingoJson;
+    }
+
+    internal static string GenerateBingoBoardAsString(bool convertToJson = true, bool copyJson = true)
+    {
+        BingoTile[] bingo = GenerateBingoBoard(GetBingoBoardOptions());
+        string jsonString = ConvertBingoBoardToJson(bingo);
+        if (copyJson) 
+            ClipboardUtility.SetText(jsonString);
+        if (convertToJson)
+        {
+            return jsonString;
+        }
+        return string.Join('\n', bingo.Select(tile => tile.Name).ToArray());
     }
 
     private static string ConvertBingoBoardToJson(BingoTile[] board)

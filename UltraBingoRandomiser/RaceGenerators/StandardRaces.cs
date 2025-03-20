@@ -70,15 +70,15 @@ internal static class StandardRaces
         return Races2;
     }
 
-    internal static string[] GetRandomStandardRaces()
+    internal static string[] GetRandomStandardRaces(int mlCount = 4, int ilCount = 5)
     {
         // Multilevel Race
 
-        string[] MultilevelRaces = GetRandomMultilevelRace(4, CategoryDefaults.All & ~CategoryDefaults.Check);
+        string[] MultilevelRaces = GetRandomMultilevelRace(mlCount, CategoryDefaults.All & ~CategoryDefaults.Check);
 
         // IL Race
 
-        string[] ILRaces = GetRandomILRaces(5,
+        string[] ILRaces = GetRandomILRaces(ilCount,
             CategoryDefaults.Any | 
             CategoryDefaults.P | 
             CategoryDefaults.Nomo | 
